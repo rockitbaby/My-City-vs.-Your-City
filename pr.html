@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<title>
+		My City vs. Your City
+	</title>
+	<script type="text/javascript" src="processing.js"></script>
+	<script type="text/javascript" src="init.js"></script>
+
+</head>
+<link type="text/css" href="reset.css" rel="stylesheet" />
+
+<body id="mycitysoundslike">
+
+<div id="wrapper">
+<div id="content">
+	<script type="application/processing">
+
+	void setup() {
+		size(300, 150);
+		noStroke();
+		frameRate(10);
+		noLoop();
+	}
+	
+	float score = 45;
+	
+	void draw() {
+		score = height - map(40, 0, 100, 0, height);
+		background(#F6F6F6);
+		fill(255, 255, 0, 100);
+		ellipse(width / 2 - score / 2, height / 2, height, height);
+		fill(0, 255, 255, 100);
+		ellipse(width / 2 + score / 2, height / 2, height, height);
+		loadPixels();
+		
+		for (int i = 0; i < width * height; i++) {
+			if(red(pixels[i]) < 120) {
+				pixels[i] = color(0, 255, 0);
+			} else if(red(pixels[i]) < 150) {
+				pixels[i] = color(255, 255, 0);
+			} else if(red(pixels[i]) < 200) {
+				pixels[i] = color(0, 255, 255);
+			}
+		}
+		//updatePixels();
+	}
+	</script><canvas width="200" height="150"></canvas>
+</div>
+</div>
+
+</body>
+</html>

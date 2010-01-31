@@ -1,0 +1,159 @@
+body {
+	font-family: "Helvetica Neue", Arial, sans-serif;
+	color: #000;
+}
+
+a {
+	color: #000;
+}
+
+#wrapper {
+	margin: 30px auto;
+	width: 740px;
+}
+
+#content {
+	float: left;
+	padding: 0 0 30px 0;
+}
+
+#list {
+	float: left;
+	border: 20px solid #F6F6F6;
+	margin: 0 0 30px 0;
+}
+
+.city {
+	width: 349px;
+	border-right: 1px solid #EEE;
+	float: left;
+	position: relative;
+}
+
+h1 {
+	text-align: right;
+	font-size: 16px;
+	margin: 0 0 20px 0;
+}
+
+h1 .my {
+	border-bottom: 5px solid #FF0;
+}
+
+h1 .and {
+	border-bottom: 5px solid #0F0;
+}
+
+h1 .your {
+	border-bottom: 5px solid #0FF;
+}
+
+#score {
+	font-size: 60px;
+	text-align: center;
+	padding: 30px 0 10px 0;
+	position: relative;
+	background-color: #F6F6F6;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	background-image: URL('vis/?p=50');
+	height: 150px;
+}
+
+#value {
+	position: absolute;
+	height: 60px;
+	width: 100%;
+	text-align: center;
+	top: 65px;
+	font-weight: bold;
+}
+
+h2,
+ol li {
+	height: 30px;
+	font-size: 16px;
+	line-height: 30px;
+	border-bottom: 1px solid #EEE;
+	padding: 0 20px;
+}
+
+div.selection {
+	height: 30px;
+	width: 100%;
+	display: none;
+	position: absolute;
+	top: 0;
+}
+
+div.selection select {
+	margin: 6px 20px;
+}
+
+ol li.hover {
+	background: #EEE;
+}
+
+ol li span {
+	font-size: 12px;
+	color: #666;
+}
+
+ol li a {
+	display: none;
+	float: right;
+	margin: 5px 0;
+	width: 20px;
+	height: 20px;
+	line-height: 20px;
+	font-size: 12px;
+	color: #FFF;
+	background-color: #666;
+	text-align: center;
+	text-decoration: none;
+}
+
+li.hover a {
+	display: block;
+}
+
+h2 {
+	font-weight: bold;
+	cursor: pointer;
+}
+
+h2 span {
+	font-weight: normal;
+	font-size: 12px;
+	color: #666;
+}
+
+#my h2,
+#my div.selection {
+	font-weight: bold;
+	background-color: #FF0;
+}
+
+#your h2,
+#your div.selection {
+	font-weight: bold;
+	background-color: #0FF;
+}
+
+#share {
+	float: left;
+	width: 100%;
+	font-size: 14px;
+	margin: 0 0 20px 20px;
+}
+
+#share a {
+	color: #000;
+}
+
+#footer {
+	text-align: center;
+	font-size: 12px;
+	line-height: 16px;
+	color: #666;
+}

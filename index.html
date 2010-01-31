@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<title>
+		My City vs. Your City
+	</title>
+	<script type="text/javascript" src="jquery-1.4.1.min.js"></script>
+	<script type="text/javascript" src="cities.js"></script>
+<script type="text/javascript">
+
+var mycity = "hamburg";
+var mycountry = "germany";
+var yourcity = "new york";
+var yourcountry = "united states";
+
+var artistLookup = {};
+var artists = {};
+
+var globalScore = 0;
+
+var current = "";
+
+String.prototype.toUpperCaseFirstLetter = function() { return this.substr(0, 1).toUpperCase() + this.substr(1); }
+String.prototype.trim = function() { return this.replace(/^\s+|\s+$/, ''); };
+
+function loadData(city, country, obj) {
+	var url = "api/?method=geo.getmetroartistchart&country=" + encodeURI(country) + "&metro=" + encodeURI(city)
+	artists[obj] = new Array();
+	artistLookup = {};
+	$("#" + obj + " ol").html("");
+
+	$.ajax({
+		type: "GET",
+		url: url,
+		dataType: "xml",
+		success: function(xml) {
+			$("#" + obj + " h2 strong").text($(xml).find("topartists").attr("metro") + ", " + country.toUpperCaseFirstLetter());
+			$("#" + obj + " ol").html("");
+			$(xml).find("artist").each(function(i) {
+				
+				var mbid = $(this).find("mbid").text();
+				var name = $(this).find("name").text();
+				
+				artistLookup[mbid] = name;
+				
+				artists[obj].push(name);
+				
+				var li = $("<li class='mbid-" + mbid + "'>" + name + "</li>");
+				li.data("mbid", mbid);
+				if(mbid != "") {
+					li.bind('mouseover', function() {
+						$(".mbid-" + $(this).data("mbid")).addClass('hover');
+					});
+					li.bind('mouseout', function() {
+						$(".mbid-" + $(this).data("mbid")).removeClass('hover');
+					});
+				}
+				var span = " <span>" + $(this).find("listeners").text() + "</span>";
+				var a = " <a href='" + $(this).find("url").text() + "'>&rarr;</a>";
+				li.append(span).append(a);
+				$("#" + obj + " ol").append(li);
+				if(i >= 10 - 1) {
+					compare();
+					return false;
+				}
+			});
+		},
+		error: function() {
+			//die in silence
+		}
+	});
+}
+
+function compare() {
+	var totalScore = 0;
+	for(i in artists['my']) {
+		var mbid = artists['my'][i];
+		var score = 10;
+		var x = artists['your'].indexOf(mbid);
+		if (isNaN(x)) {
+			x = 10;
+		}
+		score -= Math.abs(i - x);
+		totalScore += score;
+	}
+	globalScore = totalScore;
+	$('#score #value').text(totalScore + "%");
+	$('#score').css('background-image', 'URL(vis/?p=' + totalScore + ')');
+}
+
+$(window).bind("load", function() {
+	
+	var citySelection = $('<select></select>');
+	
+	for (i in cities) {
+		var city = cities[i];
+		citySelection.append("<option value='" + city + "'>" + city + "</option>");
+	}
+	citySelection.bind('change', function() {
+		var x = $(this).val();
+		
+		var data = x.split(",");
+		yourcity = data[0];
+		yourcountry = data[1].trim();
+		
+		setLocation();
+		loadData(yourcity, yourcountry, "your");
+		
+		$(this).parent('div').hide();
+		$("#your h2 strong").text(yourcity.toUpperCaseFirstLetter()  + ", " + yourcountry.toUpperCaseFirstLetter());
+		
+	});
+	$("#your .selection").append(citySelection);
+
+	myCitySelection = citySelection.clone().bind('change', function() {
+		var x = $(this).val();
+		
+		var data = x.split(",");
+		
+		mycity = data[0];
+		mycountry = data[1].trim();
+		
+		setLocation();
+		loadData(mycity, mycountry, "my");
+		$(this).parent('div').hide();
+		$("#my h2 strong").text(mycity.toUpperCaseFirstLetter()  + ", " + mycountry.toUpperCaseFirstLetter());
+		
+	});
+	$("#my .selection").append(myCitySelection);
+	
+	$('h2').live('click', function() {
+		$(this).next().show();
+	});
+	
+	if(!reloadForHash(window.location.hash.replace('#', ''))) {
+		loadData(mycity, mycountry, "my");
+		loadData(yourcity, yourcountry, "your");
+	}
+	
+	var reload = window.setInterval(function() {
+		var h = window.location.hash.replace('#', '');
+		if (h.indexOf(" ") != -1) {
+			h = encodeURI(h);
+		}
+		if (current != h) {
+			reloadForHash(h);
+			current = h;
+		}
+	}, 500);
+	
+});
+
+function reloadForHash(h) {
+	var parts = h.split("/");
+	if (parts.length != 4) {
+		return false;
+	}
+	
+	mycity = decodeURI(parts[0]);
+	mycountry = decodeURI(parts[1]);
+	yourcity = decodeURI(parts[2]);
+	yourcountry = decodeURI(parts[3]);
+	setLocation();
+}
+
+function setLocation() {
+	current = encodeURI(mycity.toLowerCase()) + "/" + encodeURI(mycountry.toLowerCase()) + "/" + encodeURI(yourcity.toLowerCase()) + "/" + encodeURI(yourcountry.toLowerCase());
+	window.location.href = "#" + current;
+}
+	
+</script>
+
+</head>
+<link type="text/css" href="reset.css" rel="stylesheet" />
+<link type="text/css" href="mycityvsyourcity.css" rel="stylesheet" />
+
+<body id="mycitysoundslike">
+
+<div id="wrapper">
+<div id="content">
+	<h1>What people listen in <span class="my">My City</span> vs. <span class="your">Your City</a></h1>
+	<div id="score">
+	<div id="value"></div>
+	</div>
+	<div id="list">
+		<div id="my" class="city">
+			<h2><strong>My City</strong> <span>&larr; Change City</span></h2>
+			<div class="selection"></div>
+			<ol>
+				
+			</ol>
+		</div>
+		<div id="your" class="city">
+			<h2><strong>Your City</strong> <span>&larr; Change City</span></h2>
+			<div class="selection"></div>
+			<ol>
+				
+			</ol>
+		</div>
+	</div>
+	<div id="footer">
+		<p>
+			feature-requests, bugs, feedback - <a href="http://fritzcrate.noisepages.com/2010/01/my-city-vs-your-city/">send me your comments</a>!<br /><br />
+			based on data from <a href="http://last.fm/">last.fm</a><br />
+			created on 30th January 2010 by <a href="http://www.rockitbaby.de/">Michael Schieben</a><br />
+			<a href="http://fritzcrate.noisepages.com/2010/01/musichackday-stockholm-in-hamburg/">Musichackday Stockholm in Hamburg</a>
+		</p>
+	</div>
+</div>
+</div>
+
+</body>
+</html>
